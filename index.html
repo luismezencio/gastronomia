@@ -3,37 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cardápio & Comandas</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>XVIII Festival de Gastronomia de Itapecerica</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #222;
-    --border: #2e2e2e;
-    --accent: #e8c547;
-    --accent2: #e87047;
-    --green: #4caf7d;
-    --red: #e05252;
-    --text: #f0f0f0;
-    --muted: #777;
-    --radius: 16px;
-    --radius-sm: 10px;
+    --terracota:   #8B3A1A;
+    --terracota2:  #A0441F;
+    --argila:      #C4602A;
+    --dourado:     #D4A043;
+    --dourado2:    #E8C070;
+    --creme:       #F5ECD7;
+    --creme2:      #EDD9B5;
+    --marrom:      #3D1F0D;
+    --marrom2:     #5A2E10;
+    --verde:       #4A6741;
+    --vermelho:    #922020;
+    --text:        #2A0F04;
+    --text-light:  #7A4020;
+    --radius:      14px;
+    --radius-sm:   8px;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: var(--bg);
+    background-color: var(--creme);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Lora', Georgia, serif;
     min-height: 100vh;
     padding-bottom: 80px;
   }
 
-  /* HEADER */
+  /* ── HEADER ── */
   .app-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
+    background: var(--terracota);
+    background-image: linear-gradient(135deg, var(--marrom2) 0%, var(--terracota) 50%, var(--terracota2) 100%);
+    padding: 18px 20px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -42,96 +49,135 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    border-bottom: 3px solid var(--dourado);
+    box-shadow: 0 4px 20px rgba(61,31,13,0.4);
   }
   .app-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--accent);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dourado2);
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
   }
-  .app-title span { color: var(--text); }
+  .app-title .subtitle {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--creme2);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: 'Lora', serif;
+    margin-top: 2px;
+  }
   .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  /* TABS */
+  /* ── TABS ── */
   .tabs {
     display: flex;
-    gap: 4px;
-    padding: 12px 20px 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
+    gap: 0;
+    background: var(--marrom);
     overflow-x: auto;
+    border-bottom: 2px solid var(--dourado);
   }
   .tab-btn {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
     font-weight: 600;
-    padding: 10px 18px;
+    padding: 11px 22px;
     border: none;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     background: transparent;
-    color: var(--muted);
+    color: var(--creme2);
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s;
-    border-bottom: 2px solid transparent;
+    opacity: 0.65;
+    letter-spacing: 0.3px;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
   }
-  .tab-btn:hover { color: var(--text); }
+  .tab-btn:hover { opacity: 0.9; }
   .tab-btn.active {
-    color: var(--accent);
-    background: var(--bg);
-    border-bottom: 2px solid var(--accent);
+    opacity: 1;
+    color: var(--dourado2);
+    border-bottom: 3px solid var(--dourado);
+    background: rgba(212,160,67,0.1);
   }
 
-  /* MAIN */
+  /* ── MAIN ── */
   .main { padding: 20px; max-width: 900px; margin: 0 auto; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* MESA SELECTOR */
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .section-label::before,
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--dourado), transparent);
+  }
+
+  /* ── MESA BAR ── */
   .mesa-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--marrom);
+    border: 1px solid var(--dourado);
     border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 20px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
     display: flex;
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
+    box-shadow: 0 2px 12px rgba(61,31,13,0.15);
   }
-  .mesa-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mesa-label {
+    font-size: 0.72rem;
+    color: var(--dourado2);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Lora', serif;
+  }
   .mesa-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
   .mesa-chip {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 6px 14px;
+    font-family: 'Lora', serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 14px;
     border-radius: 40px;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid rgba(212,160,67,0.35);
     background: transparent;
-    color: var(--muted);
+    color: var(--creme2);
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
     transition: all 0.15s;
   }
-  .mesa-chip:hover { border-color: var(--accent); color: var(--accent); }
-  .mesa-chip.active { background: var(--accent); border-color: var(--accent); color: #000; }
-  .mesa-chip .chip-del {
-    font-size: 0.7rem;
-    opacity: 0.6;
-    padding: 0 2px;
-    cursor: pointer;
-  }
-  .mesa-chip.active .chip-del { opacity: 0.5; color: #000; }
+  .mesa-chip:hover { border-color: var(--dourado); color: var(--dourado2); }
+  .mesa-chip.active { background: var(--dourado); border-color: var(--dourado); color: var(--marrom); font-weight: 700; }
+  .mesa-chip .chip-del { font-size: 0.65rem; opacity: 0.55; cursor: pointer; }
+  .mesa-chip.active .chip-del { color: var(--marrom); opacity: 0.6; }
 
-  /* BTN styles */
+  /* ── BUTTONS ── */
   .btn {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 0.78rem;
     padding: 8px 16px;
     border: none;
     border-radius: 40px;
@@ -141,48 +187,61 @@
     gap: 6px;
     transition: all 0.15s;
     white-space: nowrap;
+    letter-spacing: 0.2px;
   }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--text); color: var(--text); }
-  .btn-accent { background: var(--accent); color: #000; }
-  .btn-accent:hover { background: #f0d060; }
-  .btn-green { background: var(--green); color: #fff; }
-  .btn-green:hover { background: #5dc98e; }
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-red:hover { background: #f06060; }
-  .btn-orange { background: var(--accent2); color: #fff; }
-  .btn-orange:hover { background: #f08050; }
-  .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--dourado2);
+    border: 1.5px solid rgba(212,160,67,0.5);
+  }
+  .btn-ghost:hover { border-color: var(--dourado2); background: rgba(212,160,67,0.1); }
+  .btn-accent { background: var(--dourado); color: var(--marrom); font-weight: 700; }
+  .btn-accent:hover { background: var(--dourado2); }
+  .btn-green { background: var(--verde); color: #fff; }
+  .btn-green:hover { background: #5a7a50; }
+  .btn-red { background: var(--vermelho); color: #fff; }
+  .btn-red:hover { background: #a83030; }
+  .btn-orange { background: var(--argila); color: #fff; }
+  .btn-orange:hover { background: var(--terracota2); }
+  .btn-sm { padding: 5px 12px; font-size: 0.72rem; }
 
-  /* PRODUTO CARDS */
+  /* ── PRODUTO CARDS ── */
   .produtos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
     gap: 12px;
     margin-bottom: 28px;
   }
   .card-produto {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid var(--creme2);
+    border-top: 3px solid var(--dourado);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: border-color 0.15s;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(61,31,13,0.07);
   }
-  .card-produto:hover { border-color: #444; }
+  .card-produto:hover {
+    border-color: var(--argila);
+    box-shadow: 0 4px 16px rgba(139,58,26,0.15);
+    transform: translateY(-2px);
+  }
   .prod-nome {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.88rem;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.35;
     flex: 1;
+    color: var(--marrom);
   }
   .prod-preco {
     font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--accent);
+    font-weight: 600;
+    color: var(--argila);
+    font-family: 'Lora', serif;
   }
   .qtd-row {
     display: flex;
@@ -193,23 +252,25 @@
   .qtd-btn {
     width: 30px; height: 30px;
     border-radius: 50%;
-    border: 1.5px solid var(--border);
-    background: transparent;
-    color: var(--text);
+    border: 1.5px solid var(--creme2);
+    background: var(--creme);
+    color: var(--terracota);
     font-size: 1.1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s;
+    font-family: 'Lora', serif;
   }
-  .qtd-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .qtd-btn:hover { border-color: var(--dourado); background: var(--dourado2); color: var(--marrom); }
   .qtd-val {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
     font-size: 1rem;
     min-width: 24px;
     text-align: center;
+    color: var(--marrom);
   }
   .card-btns {
     display: grid;
@@ -217,160 +278,173 @@
     gap: 6px;
   }
   .ficha-btn {
-    padding: 9px;
+    padding: 8px;
     border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.75rem;
+    border: 1.5px solid var(--creme2);
+    background: var(--creme);
+    color: var(--text-light);
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 0.72rem;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .ficha-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .ficha-btn:hover { border-color: var(--argila); color: var(--argila); background: #fff; }
   .add-prod-btn {
     width: 100%;
-    padding: 9px;
+    padding: 8px;
     border-radius: var(--radius-sm);
     border: none;
-    background: var(--accent);
-    color: #000;
-    font-family: 'Syne', sans-serif;
+    background: var(--terracota);
+    color: var(--creme);
+    font-family: 'Lora', serif;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
     transition: background 0.15s;
   }
-  .add-prod-btn:hover { background: #f0d060; }
+  .add-prod-btn:hover { background: var(--terracota2); }
 
-  /* CARRINHO */
+  /* ── CARRINHO ── */
   .carrinho-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid var(--creme2);
     border-radius: var(--radius);
     overflow: hidden;
+    box-shadow: 0 2px 12px rgba(61,31,13,0.08);
   }
   .carrinho-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 14px 18px;
+    border-bottom: 2px solid var(--creme2);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
+    background: linear-gradient(to right, var(--creme), #fff);
   }
   .carrinho-titulo {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Playfair Display', serif;
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: 700;
+    color: var(--marrom);
   }
-  .carrinho-body { padding: 8px 0; min-height: 60px; }
+  .carrinho-body { padding: 4px 0; min-height: 60px; }
   .carrinho-vazio {
     text-align: center;
-    color: var(--muted);
-    font-size: 0.9rem;
+    color: var(--text-light);
+    font-size: 0.88rem;
     padding: 32px;
+    font-style: italic;
   }
   .item-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--creme2);
     flex-wrap: wrap;
+    transition: background 0.1s;
   }
+  .item-row:hover { background: var(--creme); }
   .item-info { flex: 1; min-width: 140px; }
-  .item-nome { font-size: 0.9rem; font-weight: 500; }
-  .item-detalhe { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-  .item-subtotal { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 0.95rem; min-width: 70px; text-align: right; }
+  .item-nome { font-size: 0.88rem; font-weight: 600; color: var(--marrom); font-family: 'Playfair Display', serif; }
+  .item-detalhe { font-size: 0.76rem; color: var(--text-light); margin-top: 2px; }
+  .item-subtotal { font-family: 'Lora', serif; font-weight: 600; color: var(--argila); font-size: 0.95rem; min-width: 70px; text-align: right; }
   .item-acoes { display: flex; gap: 6px; }
   .carrinho-footer {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
+    padding: 14px 18px;
+    border-top: 2px solid var(--creme2);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
+    background: linear-gradient(to right, var(--creme), #fff);
   }
-  .total-label { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; }
-  .total-val { color: var(--accent); }
+  .total-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--marrom);
+  }
+  .total-val { color: var(--terracota); }
   .footer-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  /* IMPRESSORA STATUS */
+  /* ── PRINTER STATUS ── */
   .printer-status {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    padding: 9px 14px;
+    background: var(--marrom);
+    border: 1px solid rgba(212,160,67,0.3);
     border-radius: var(--radius-sm);
-    margin-bottom: 20px;
-    font-size: 0.82rem;
+    margin-bottom: 18px;
+    font-size: 0.8rem;
   }
   .status-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: var(--muted);
+    background: var(--text-light);
     flex-shrink: 0;
     transition: background 0.3s;
   }
-  .status-dot.conectado { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .status-dot.erro { background: var(--red); }
-  .status-text { flex: 1; color: var(--muted); }
+  .status-dot.conectado { background: #7abf70; box-shadow: 0 0 6px #7abf70; }
+  .status-dot.erro { background: #d45050; }
+  .status-text { flex: 1; color: var(--creme2); font-family: 'Lora', serif; }
 
-  /* ADMIN */
+  /* ── ADMIN ── */
   .admin-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid var(--creme2);
     border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(61,31,13,0.07);
   }
   .admin-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    font-family: 'Syne', sans-serif;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--creme2);
+    font-family: 'Playfair Display', serif;
     font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    color: var(--terracota);
+    background: var(--creme);
+    letter-spacing: 0.3px;
   }
-  .admin-body { padding: 16px 20px; }
+  .admin-body { padding: 16px 18px; }
   .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .inp {
     flex: 1;
     min-width: 120px;
     padding: 10px 14px;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
+    background: var(--creme);
+    border: 1.5px solid var(--creme2);
     border-radius: var(--radius-sm);
     color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
+    font-family: 'Lora', serif;
+    font-size: 0.88rem;
     transition: border-color 0.15s;
   }
-  .inp:focus { outline: none; border-color: var(--accent); }
-  .inp::placeholder { color: var(--muted); }
+  .inp:focus { outline: none; border-color: var(--dourado); }
+  .inp::placeholder { color: var(--text-light); opacity: 0.6; }
   .lista-admin { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
   .prod-admin-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: var(--creme);
+    border: 1px solid var(--creme2);
     border-radius: var(--radius-sm);
-    font-size: 0.85rem;
+    font-size: 0.84rem;
   }
-  .prod-admin-nome { flex: 1; }
-  .prod-admin-preco { color: var(--accent); margin: 0 12px; font-weight: 500; }
+  .prod-admin-nome { flex: 1; color: var(--marrom); font-family: 'Lora', serif; }
+  .prod-admin-preco { color: var(--argila); margin: 0 12px; font-weight: 600; font-family: 'Lora', serif; }
 
-  /* TOAST */
+  /* ── TOAST ── */
   .toast-container {
     position: fixed;
     bottom: 24px;
@@ -383,35 +457,51 @@
     pointer-events: none;
   }
   .toast {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Lora', serif;
     font-weight: 600;
-    font-size: 0.85rem;
-    padding: 12px 20px;
+    font-size: 0.84rem;
+    padding: 11px 22px;
     border-radius: 40px;
     color: #fff;
     white-space: nowrap;
     animation: toastIn 0.25s ease, toastOut 0.3s ease 2.7s forwards;
     pointer-events: auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
   }
-  .toast.sucesso { background: var(--green); }
-  .toast.erro { background: var(--red); }
-  .toast.info { background: #444; }
-  @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .toast.sucesso { background: var(--verde); }
+  .toast.erro    { background: var(--vermelho); }
+  .toast.info    { background: var(--marrom2); }
+  @keyframes toastIn  { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
   @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateY(8px); } }
+
+  /* ── ORNAMENT DIVIDER ── */
+  .ornament {
+    text-align: center;
+    color: var(--dourado);
+    font-size: 1rem;
+    margin: 20px 0 16px;
+    letter-spacing: 6px;
+    opacity: 0.6;
+    user-select: none;
+  }
 
   @media (max-width: 500px) {
     .main { padding: 12px; }
     .produtos-grid { grid-template-columns: 1fr 1fr; }
+    .app-title { font-size: 0.9rem; }
   }
 </style>
 </head>
 <body>
 
 <header class="app-header">
-  <div class="app-title">🍽 Cardápio <span>& Comandas</span></div>
+  <div class="app-title">
+    🍽 XVIII Festival de Gastronomia de Itapecerica
+    <span class="subtitle">Comandas &amp; Pedidos</span>
+  </div>
   <div class="header-actions">
     <button class="btn btn-ghost" id="btnNovaMesa">➕ Nova Mesa</button>
-    <button class="btn btn-ghost" id="btnConectar">🔌 Conectar Impressora</button>
+    <button class="btn btn-ghost" id="btnConectar">🔌 Impressora</button>
   </div>
 </header>
 
@@ -424,6 +514,7 @@
 
   <!-- PEDIDO TAB -->
   <div class="tab-panel active" id="tab-pedido">
+
     <div class="mesa-bar">
       <span class="mesa-label">Mesa</span>
       <div class="mesa-chips" id="mesaChips"></div>
@@ -435,7 +526,10 @@
       <button class="btn btn-ghost btn-sm" id="btnTestar">Testar</button>
     </div>
 
+    <div class="section-label">Cardápio</div>
     <div id="produtosGrid" class="produtos-grid"></div>
+
+    <div class="ornament">✦ ✦ ✦</div>
 
     <div class="carrinho-section">
       <div class="carrinho-header">
@@ -457,7 +551,7 @@
   <!-- ADMIN TAB -->
   <div class="tab-panel" id="tab-admin">
     <div class="admin-section">
-      <div class="admin-header">Adicionar produto</div>
+      <div class="admin-header">Adicionar produto ao cardápio</div>
       <div class="admin-body">
         <div class="form-row">
           <input class="inp" id="inputNome" placeholder="Nome do produto" />
@@ -485,6 +579,8 @@ let usbDevice = null;
 let usbEndpoint = null;
 let usbInterface = null;
 
+const NOME_FESTIVAL = "XVIII Festival de Gastronomia de Itapecerica";
+
 const PRODUTOS_PADRAO = [
   { nome: "Virado à Mineira", preco: 35.00 },
   { nome: "Macarrão na Bateia", preco: 30.00 },
@@ -510,7 +606,6 @@ function carregar() {
   const p = localStorage.getItem("cmd_produtos");
   const c = localStorage.getItem("cmd_comandas");
   const a = localStorage.getItem("cmd_ativa");
-
   produtos = p ? JSON.parse(p) : PRODUTOS_PADRAO.map((x, i) => ({ id: Date.now() + i, ...x }));
   comandas = c ? JSON.parse(c) : { "Mesa 1": [] };
   const keys = Object.keys(comandas);
@@ -626,11 +721,8 @@ function renderMesas() {
     chip.className = "mesa-chip" + (mesa === comandaAtiva ? " active" : "");
     chip.innerHTML = `${esc(mesa)} <span class="chip-del" data-mesa="${esc(mesa)}">✕</span>`;
     chip.addEventListener("click", (e) => {
-      if (e.target.classList.contains("chip-del")) {
-        removerMesa(e.target.dataset.mesa);
-      } else {
-        trocarMesa(mesa);
-      }
+      if (e.target.classList.contains("chip-del")) removerMesa(e.target.dataset.mesa);
+      else trocarMesa(mesa);
     });
     container.appendChild(chip);
   });
@@ -755,14 +847,9 @@ async function conectarUSB() {
     toast("WebUSB não suportado. Use Chrome no Android.", "erro");
     return false;
   }
-
-  // Se já está conectado e funcional, ok
   if (usbDevice && usbDevice.opened && usbEndpoint !== null) return true;
-
-  // Limpa conexão anterior
   await desconectarUSB();
   setStatus("Conectando...", "");
-
   try {
     const autorizados = await navigator.usb.getDevices();
     usbDevice = autorizados.length > 0
@@ -780,15 +867,12 @@ async function conectarUSB() {
       }
       if (ifaceIdx !== -1) break;
     }
-
     if (ifaceIdx === -1) throw new Error("Nenhum endpoint de saída encontrado.");
 
     await usbDevice.claimInterface(ifaceIdx);
     usbInterface = ifaceIdx;
-
     setStatus(`Conectado: ${usbDevice.productName || "Impressora USB"}`, "conectado");
     return true;
-
   } catch (err) {
     console.error("Erro USB:", err);
     setStatus("Falha na conexão", "erro");
@@ -798,59 +882,44 @@ async function conectarUSB() {
   }
 }
 
-// Remove acentos e caracteres fora do ASCII
 function removerAcentos(texto) {
   return texto
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")  // remove diacríticos (á→a, ç→c, etc)
-    .replace(/[^\x00-\x7F]/g, "");    // remove qualquer coisa fora do ASCII
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\x00-\x7F]/g, "");
 }
 
-// Converte texto para bytes Latin-1 sem acentos (compatível com ESC/POS)
 function toLatin1(texto) {
   const limpo = removerAcentos(texto);
   const bytes = new Uint8Array(limpo.length);
-  for (let i = 0; i < limpo.length; i++) {
-    bytes[i] = limpo.charCodeAt(i) & 0xFF;
-  }
+  for (let i = 0; i < limpo.length; i++) bytes[i] = limpo.charCodeAt(i) & 0xFF;
   return bytes;
 }
 
-async function enviarESCPOS(linhas) {
+async function enviarESCPOS(linhas, titulo = NOME_FESTIVAL) {
   const ok = await conectarUSB();
   if (!ok) return false;
-
   try {
-    // 0x1D 0x21 0x11 = altura x2 + largura x2 (fonte grande)
-    // 0x1D 0x21 0x10 = só largura x2
-    // 0x1D 0x21 0x01 = só altura x2
-    // 0x1D 0x21 0x00 = tamanho normal
-    const fontGrande    = new Uint8Array([0x1D, 0x21, 0x11]); // dobra largura e altura
-    const fontNormal    = new Uint8Array([0x1D, 0x21, 0x00]);
-    const fontMedio     = new Uint8Array([0x1D, 0x21, 0x01]); // só altura x2
+    const fontGrande = new Uint8Array([0x1D, 0x21, 0x11]);
+    const fontNormal = new Uint8Array([0x1D, 0x21, 0x00]);
+    const fontMedio  = new Uint8Array([0x1D, 0x21, 0x01]);
 
     const blocos = [
-      new Uint8Array([0x1B, 0x40]),       // inicializar
-      new Uint8Array([0x1B, 0x74, 0x00]), // charset PC437 (ASCII puro, mais compatível)
-      new Uint8Array([0x1B, 0x61, 0x01]), // centralizar
-      new Uint8Array([0x1B, 0x45, 0x01]), // bold on
+      new Uint8Array([0x1B, 0x40]),
+      new Uint8Array([0x1B, 0x74, 0x00]),
+      new Uint8Array([0x1B, 0x61, 0x01]),
+      new Uint8Array([0x1B, 0x45, 0x01]),
       fontGrande,
-      toLatin1("CARDAPIO\n"),
+      toLatin1(titulo + "\n"),
       fontNormal,
-      new Uint8Array([0x1B, 0x45, 0x00]), // bold off
+      new Uint8Array([0x1B, 0x45, 0x00]),
       toLatin1("--------------------------------\n"),
-      new Uint8Array([0x1B, 0x61, 0x00]), // alinhar esquerda
+      new Uint8Array([0x1B, 0x61, 0x00]),
     ];
 
     for (const linha of linhas) {
-      // Linhas que começam com espaço são detalhes (preço/qtd) — fonte normal
-      // Demais são nomes de produtos — fonte média (altura dupla)
       const ehDetalhe = linha.startsWith("  ") || linha.startsWith("---") || linha.startsWith("TOTAL") || linha.startsWith("Data");
-      if (ehDetalhe) {
-        blocos.push(fontNormal);
-      } else {
-        blocos.push(fontMedio); // altura x2 para nomes e títulos
-      }
+      blocos.push(ehDetalhe ? fontNormal : fontMedio);
       const limitada = linha.length > 32 ? linha.substring(0, 29) + "..." : linha;
       blocos.push(toLatin1(limitada + "\n"));
     }
@@ -858,15 +927,12 @@ async function enviarESCPOS(linhas) {
     blocos.push(
       fontNormal,
       toLatin1("--------------------------------\n"),
-      new Uint8Array([0x0A, 0x0A]),             // 2 linhas em branco
-      new Uint8Array([0x1D, 0x56, 0x42, 0x00])  // cortar papel
+      new Uint8Array([0x0A, 0x0A]),
+      new Uint8Array([0x1D, 0x56, 0x42, 0x00])
     );
 
-    for (const bloco of blocos) {
-      await usbDevice.transferOut(usbEndpoint, bloco);
-    }
+    for (const bloco of blocos) await usbDevice.transferOut(usbEndpoint, bloco);
     return true;
-
   } catch (err) {
     console.error("Erro transmissão USB:", err);
     toast("Erro na transmissão: " + err.message, "erro");
@@ -880,34 +946,33 @@ async function imprimirFicha(prod, qtd) {
   adicionarItem(prod, qtd);
   document.getElementById(`qtd-${prod.id}`).textContent = "1";
   const sub = prod.preco * qtd;
+  const numMesa = comandaAtiva.replace(/\D/g, "") || comandaAtiva;
   const linhas = [
-    `${comandaAtiva}`,
-    "--- FICHA ---",
+    numMesa,
     `${prod.nome}`,
     `  x${qtd}  R$ ${sub.toFixed(2)}`,
     `Data: ${new Date().toLocaleString("pt-BR")}`
   ];
-  const ok = await enviarESCPOS(linhas);
+  const ok = await enviarESCPOS(linhas, NOME_FESTIVAL);
   if (ok) toast("Ficha impressa!", "sucesso");
 }
 
 async function imprimirItens(itens) {
   if (!itens.length) return;
-  const linhas = [`${comandaAtiva} — Item`];
+  const linhas = [`${comandaAtiva} - Item`];
   itens.forEach(item => {
     const sub = item.preco * item.qtd;
     linhas.push(`${item.nome}`);
     linhas.push(`  x${item.qtd}  R$ ${sub.toFixed(2)}`);
   });
   linhas.push(`Data: ${new Date().toLocaleString("pt-BR")}`);
-  const ok = await enviarESCPOS(linhas);
+  const ok = await enviarESCPOS(linhas, NOME_FESTIVAL);
   if (ok) toast("Item impresso!", "sucesso");
 }
 
 async function imprimirCompleto() {
   const c = getCarrinho();
   if (!c.length) { toast("Carrinho vazio", "erro"); return; }
-
   const linhas = [`${comandaAtiva}`, "--- Itens ---"];
   let total = 0;
   c.forEach(item => {
@@ -917,8 +982,7 @@ async function imprimirCompleto() {
     linhas.push(`  x${item.qtd}  R$ ${sub.toFixed(2)}`);
   });
   linhas.push("---", `TOTAL: R$ ${total.toFixed(2)}`, `Data: ${new Date().toLocaleString("pt-BR")}`);
-
-  const ok = await enviarESCPOS(linhas);
+  const ok = await enviarESCPOS(linhas, NOME_FESTIVAL);
   if (ok) {
     toast("Pedido impresso!", "sucesso");
     if (confirm("Limpar carrinho após impressão?")) {
@@ -936,13 +1000,10 @@ async function testarImpressora() {
     "123456789012345678901234567890",
     "Fim do teste: " + new Date().toLocaleString("pt-BR")
   ];
-  const ok = await enviarESCPOS(linhas);
+  const ok = await enviarESCPOS(linhas, NOME_FESTIVAL);
   if (ok) toast("Teste enviado com sucesso!", "sucesso");
 }
 
-// ============================================================
-// UTILS
-// ============================================================
 function esc(str) {
   return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
@@ -957,7 +1018,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderMesas();
   renderAdmin();
 
-  // Tabs
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -978,7 +1038,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   document.getElementById("btnImprimirCompleto").addEventListener("click", imprimirCompleto);
-
   document.getElementById("btnAdicionarProd").addEventListener("click", () => {
     const nome = document.getElementById("inputNome").value.trim();
     const preco = parseFloat(document.getElementById("inputPreco").value);
