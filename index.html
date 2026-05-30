@@ -3,237 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Cardápio + Comandas | Impressão ESC/POS</title>
+    <title>Cardápio + Comandas | Impressão ESC/POS (Corrigido)</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-        }
-        body {
-            background: #f5f5f5;
-            margin: 0;
-            padding: 12px;
-            padding-bottom: 100px;
-        }
-        /* Comandas (mesas) */
-        .comandas-header {
-            background: white;
-            border-radius: 20px;
-            padding: 12px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-        }
-        .comandas-header label {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .mesa-select {
-            flex: 1;
-            padding: 8px;
-            border-radius: 40px;
-            border: 1px solid #ccc;
-            background: #fefefe;
-        }
-        .btn-nova-mesa {
-            background: #27ae60;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .badge-mesa {
-            background: #ecf0f1;
-            border-radius: 30px;
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .badge-mesa.ativa {
-            background: #3498db;
-            color: white;
-        }
-        .remover-mesa {
-            background: none;
-            border: none;
-            color: #e74c3c;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0 4px;
-        }
-        .produtos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 14px;
-            margin-bottom: 25px;
-        }
-        .card-produto {
-            background: white;
-            border-radius: 20px;
-            padding: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        .card-produto h3 {
-            margin: 0 0 6px;
-            font-size: 1rem;
-        }
-        .preco {
-            font-weight: bold;
-            color: #e67e22;
-            font-size: 1.2rem;
-            margin: 6px 0;
-        }
-        .qtd-controle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 8px 0;
-        }
-        .qtd-controle button {
-            background: #3498db;
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            font-size: 1.2rem;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        .qtd-controle span {
-            font-size: 1.2rem;
-            font-weight: bold;
-            min-width: 28px;
-        }
-        .add-btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 40px;
-            width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .carrinho {
-            background: white;
-            border-radius: 28px;
-            padding: 16px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .carrinho h2 {
-            margin-top: 0;
-            font-size: 1.3rem;
-            border-left: 5px solid #e67e22;
-            padding-left: 12px;
-        }
-        .item-carrinho {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding: 8px 0;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .item-info {
-            flex: 2;
-        }
-        .item-acoes {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .btn-imprimir-item {
-            background: #f39c12;
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        .btn-remover-item {
-            background: #e74c3c;
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        .total {
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-align: right;
-            margin: 15px 0;
-            border-top: 2px dashed #ccc;
-            padding-top: 12px;
-        }
-        .acoes-carrinho {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        button {
-            background: #2c3e50;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-imprimir-completo {
-            background: #e67e22;
-            flex: 1;
-        }
-        .btn-limpar-comanda {
-            background: #95a5a6;
-        }
-        .admin-panel {
-            background: #ecf0f1;
-            border-radius: 28px;
-            padding: 16px;
-            margin-top: 25px;
-        }
-        .form-produto {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-        .form-produto input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 30px;
-            border: 1px solid #bdc3c7;
-        }
-        .lista-admin {
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        .produto-admin {
-            display: flex;
-            justify-content: space-between;
-            background: white;
-            margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 40px;
-        }
-        @media (max-width: 500px) {
-            .produtos-grid { grid-template-columns: 1fr 1fr; }
-        }
+        * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f5f5; margin: 0; padding: 12px; padding-bottom: 100px; }
+        .comandas-header { background: white; border-radius: 20px; padding: 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .mesa-select { flex: 1; padding: 8px; border-radius: 40px; border: 1px solid #ccc; }
+        .btn-nova-mesa { background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 40px; }
+        .badge-mesa { background: #ecf0f1; border-radius: 30px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-mesa.ativa { background: #3498db; color: white; }
+        .produtos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 25px; }
+        .card-produto { background: white; border-radius: 20px; padding: 12px; text-align: center; }
+        .preco { font-weight: bold; color: #e67e22; font-size: 1.2rem; margin: 6px 0; }
+        .qtd-controle { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
+        .qtd-controle button { background: #3498db; border: none; color: white; width: 32px; height: 32px; border-radius: 30px; }
+        .add-btn { background: #27ae60; color: white; border: none; padding: 8px; border-radius: 40px; width: 100%; font-weight: bold; }
+        .carrinho { background: white; border-radius: 28px; padding: 16px; margin-top: 20px; }
+        .item-carrinho { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0; flex-wrap: wrap; gap: 6px; }
+        .btn-imprimir-item { background: #f39c12; border: none; color: white; padding: 6px 12px; border-radius: 30px; }
+        .btn-remover-item { background: #e74c3c; border: none; color: white; padding: 6px 12px; border-radius: 30px; }
+        .total { font-size: 1.4rem; font-weight: bold; text-align: right; border-top: 2px dashed #ccc; padding-top: 12px; }
+        .acoes-carrinho { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+        button { background: #2c3e50; border: none; padding: 10px 16px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; }
+        .btn-imprimir-completo { background: #e67e22; flex: 1; }
+        .btn-testar { background: #16a085; }
+        .admin-panel { background: #ecf0f1; border-radius: 28px; padding: 16px; margin-top: 25px; }
+        .form-produto { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .form-produto input { flex: 1; padding: 10px; border-radius: 30px; border: 1px solid #bdc3c7; }
+        .lista-admin { max-height: 180px; overflow-y: auto; }
+        .produto-admin { display: flex; justify-content: space-between; background: white; margin: 5px 0; padding: 8px 12px; border-radius: 40px; }
+        @media (max-width: 500px) { .produtos-grid { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
@@ -242,13 +41,14 @@
     <label>🍽️ Comanda atual:</label>
     <select id="selectMesa" class="mesa-select"></select>
     <button id="btnNovaMesa" class="btn-nova-mesa">➕ Nova Mesa</button>
+    <button id="btnTestarImpressora" class="btn-testar">🖨️ Testar Impressora</button>
 </div>
 <div id="listaBadges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;"></div>
 
 <div id="produtosContainer" class="produtos-grid"></div>
 
 <div class="carrinho">
-    <h2 id="tituloComanda">🛒 Pedido - Mesa </h2>
+    <h2 id="tituloComanda">🛒 Pedido - Mesa</h2>
     <div id="carrinhoLista"></div>
     <div id="totalCarrinho" class="total">Total: R$ 0,00</div>
     <div class="acoes-carrinho">
@@ -260,7 +60,7 @@
 <div class="admin-panel">
     <h3>⚙️ Administrar cardápio</h3>
     <div class="form-produto">
-        <input type="text" id="novoNome" placeholder="Nome do produto" autocomplete="off">
+        <input type="text" id="novoNome" placeholder="Nome do produto">
         <input type="number" id="novoPreco" placeholder="Preço (R$)" step="0.01">
         <button id="adicionarProdutoBtn">➕ Adicionar</button>
     </div>
@@ -269,17 +69,13 @@
 </div>
 
 <script>
-    // ---------- DADOS GLOBAIS ----------
-    let produtos = [];               // { id, nome, preco }
-    let comandas = {};              // { "Mesa 1": [carrinhoItems], "Mesa 2": [...] }
-    let comandaAtiva = "Mesa 1";    // ID da comanda atual
+    // ---------- DADOS ----------
+    let produtos = [];
+    let comandas = {};
+    let comandaAtiva = "Mesa 1";
+    let device = null;
+    let outEndpoint = null;  // endpoint de saída dinâmico
 
-    // Chaves localStorage
-    const STORAGE_PRODUTOS = "cardapio_produtos";
-    const STORAGE_COMANDAS = "cardapio_comandas";
-    const STORAGE_ATIVA = "cardapio_comanda_ativa";
-
-    // ---------- DADOS INICIAIS (produtos fixos solicitados) ----------
     const produtosIniciais = [
         { nome: "Virado à Mineira", preco: 35.00 },
         { nome: "Macarrão na Bateia", preco: 30.00 },
@@ -292,92 +88,25 @@
         { nome: "Conserva de Jiló com Cebola Roxa - 500mL", preco: 30.00 }
     ];
 
-    // Carregar ou inicializar produtos
+    // Storage
     function carregarProdutos() {
-        const saved = localStorage.getItem(STORAGE_PRODUTOS);
-        if(saved) {
-            produtos = JSON.parse(saved);
-        } else {
-            produtos = [];
-            for(let i=0; i<produtosIniciais.length; i++) {
-                produtos.push({
-                    id: Date.now() + i,
-                    nome: produtosIniciais[i].nome,
-                    preco: produtosIniciais[i].preco
-                });
-            }
-        }
+        const saved = localStorage.getItem("cardapio_produtos");
+        if(saved) produtos = JSON.parse(saved);
+        else produtos = produtosIniciais.map((p, i) => ({ id: Date.now()+i, nome: p.nome, preco: p.preco }));
     }
-
-    // Carregar comandas
     function carregarComandas() {
-        const saved = localStorage.getItem(STORAGE_COMANDAS);
-        if(saved) {
-            comandas = JSON.parse(saved);
-        } else {
-            comandas = {
-                "Mesa 1": []
-            };
-        }
-        const ativa = localStorage.getItem(STORAGE_ATIVA);
-        if(ativa && comandas[ativa]) {
-            comandaAtiva = ativa;
-        } else {
-            comandaAtiva = Object.keys(comandas)[0] || "Mesa 1";
-            if(!comandas[comandaAtiva]) comandas[comandaAtiva] = [];
-        }
+        const saved = localStorage.getItem("cardapio_comandas");
+        if(saved) comandas = JSON.parse(saved);
+        else comandas = { "Mesa 1": [] };
+        const ativa = localStorage.getItem("cardapio_comanda_ativa");
+        comandaAtiva = (ativa && comandas[ativa]) ? ativa : Object.keys(comandas)[0];
     }
+    function salvarProdutos() { localStorage.setItem("cardapio_produtos", JSON.stringify(produtos)); }
+    function salvarComandas() { localStorage.setItem("cardapio_comandas", JSON.stringify(comandas)); localStorage.setItem("cardapio_comanda_ativa", comandaAtiva); }
+    function getCarrinhoAtual() { if(!comandas[comandaAtiva]) comandas[comandaAtiva] = []; return comandas[comandaAtiva]; }
+    function setCarrinhoAtual(novo) { comandas[comandaAtiva] = novo; salvarComandas(); renderizarCarrinho(); }
 
-    function salvarProdutos() {
-        localStorage.setItem(STORAGE_PRODUTOS, JSON.stringify(produtos));
-    }
-
-    function salvarComandas() {
-        localStorage.setItem(STORAGE_COMANDAS, JSON.stringify(comandas));
-        localStorage.setItem(STORAGE_ATIVA, comandaAtiva);
-    }
-
-    // Obter carrinho da comanda ativa
-    function getCarrinhoAtual() {
-        if(!comandas[comandaAtiva]) comandas[comandaAtiva] = [];
-        return comandas[comandaAtiva];
-    }
-
-    function setCarrinhoAtual(novoCarrinho) {
-        comandas[comandaAtiva] = novoCarrinho;
-        salvarComandas();
-    }
-
-    // Adicionar item à comanda atual
-    function adicionarAoCarrinho(id, nome, preco, quantidade) {
-        let carrinho = getCarrinhoAtual();
-        const index = carrinho.findIndex(item => item.id === id);
-        if(index !== -1) {
-            carrinho[index].quantidade += quantidade;
-        } else {
-            carrinho.push({ id, nome, preco, quantidade });
-        }
-        setCarrinhoAtual(carrinho);
-        renderizarCarrinho();
-    }
-
-    // Remover item do carrinho atual
-    function removerItemDoCarrinho(index) {
-        let carrinho = getCarrinhoAtual();
-        carrinho.splice(index, 1);
-        setCarrinhoAtual(carrinho);
-        renderizarCarrinho();
-    }
-
-    // Limpar toda a comanda atual
-    function limparComandaAtual() {
-        if(confirm(`Limpar todos os itens da ${comandaAtiva}?`)) {
-            setCarrinhoAtual([]);
-            renderizarCarrinho();
-        }
-    }
-
-    // ---------- UI: Cardápio ----------
+    // ---------- UI ----------
     function renderizarCardapio() {
         const container = document.getElementById("produtosContainer");
         if(!container) return;
@@ -397,7 +126,6 @@
             `;
             container.appendChild(card);
         });
-
         document.querySelectorAll(".btn-qtd-menos").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const id = parseInt(btn.dataset.id);
@@ -430,74 +158,69 @@
         });
     }
 
-    // Renderizar carrinho da comanda atual com botões de imprimir item
+    function adicionarAoCarrinho(id, nome, preco, quantidade) {
+        let carrinho = getCarrinhoAtual();
+        const idx = carrinho.findIndex(item => item.id === id);
+        if(idx !== -1) carrinho[idx].quantidade += quantidade;
+        else carrinho.push({ id, nome, preco, quantidade });
+        setCarrinhoAtual(carrinho);
+    }
+
     function renderizarCarrinho() {
         const listaDiv = document.getElementById("carrinhoLista");
         const totalDiv = document.getElementById("totalCarrinho");
         const tituloSpan = document.getElementById("tituloComanda");
         if(tituloSpan) tituloSpan.innerText = `🛒 Pedido - ${comandaAtiva}`;
-        
         const carrinho = getCarrinhoAtual();
-        if(!listaDiv) return;
         if(carrinho.length === 0) {
-            listaDiv.innerHTML = "<p style='text-align:center; color:#888;'>Carrinho vazio</p>";
+            listaDiv.innerHTML = "<p style='text-align:center;'>Carrinho vazio</p>";
             totalDiv.innerText = "Total: R$ 0,00";
             return;
         }
-        let html = "";
-        let total = 0;
+        let html = "", total = 0;
         carrinho.forEach((item, idx) => {
             const subtotal = item.preco * item.quantidade;
             total += subtotal;
             html += `
                 <div class="item-carrinho">
-                    <div class="item-info">
-                        <strong>${escapeHTML(item.nome)}</strong> x ${item.quantidade}<br>
-                        <small>R$ ${subtotal.toFixed(2)}</small>
-                    </div>
-                    <div class="item-acoes">
-                        <button class="btn-imprimir-item" data-index="${idx}" data-nome="${item.nome}" data-preco="${item.preco}" data-qtd="${item.quantidade}">🖨️ Item</button>
-                        <button class="btn-remover-item" data-index="${idx}">🗑️</button>
+                    <div><strong>${escapeHTML(item.nome)}</strong> x ${item.quantidade} - R$ ${subtotal.toFixed(2)}</div>
+                    <div>
+                        <button class="btn-imprimir-item" data-idx="${idx}" data-nome="${item.nome}" data-preco="${item.preco}" data-qtd="${item.quantidade}">🖨️ Item</button>
+                        <button class="btn-remover-item" data-idx="${idx}">🗑️</button>
                     </div>
                 </div>
             `;
         });
         listaDiv.innerHTML = html;
         totalDiv.innerText = `Total: R$ ${total.toFixed(2)}`;
-
-        // Eventos dos botões do carrinho
         document.querySelectorAll(".btn-remover-item").forEach(btn => {
             btn.addEventListener("click", (e) => {
-                const idx = parseInt(btn.dataset.index);
-                removerItemDoCarrinho(idx);
+                let carrinho = getCarrinhoAtual();
+                carrinho.splice(parseInt(btn.dataset.idx), 1);
+                setCarrinhoAtual(carrinho);
             });
         });
         document.querySelectorAll(".btn-imprimir-item").forEach(btn => {
             btn.addEventListener("click", async (e) => {
-                const nome = btn.dataset.nome;
-                const preco = parseFloat(btn.dataset.preco);
-                const quantidade = parseInt(btn.dataset.qtd);
-                const subtotal = preco * quantidade;
-                // Cria um "pedido" falso contendo só esse item
-                const itemUnico = [{ nome, preco, quantidade, subtotal }];
-                await iniciarImpressaoItem(itemUnico, nome);
+                const item = {
+                    nome: btn.dataset.nome,
+                    preco: parseFloat(btn.dataset.preco),
+                    quantidade: parseInt(btn.dataset.qtd)
+                };
+                await imprimirItens([item]);
             });
         });
     }
 
-    // ---------- ADMIN PRODUTOS ----------
     function renderAdminProdutos() {
-        const containerAdmin = document.getElementById("listaProdutosAdmin");
-        if(!containerAdmin) return;
-        containerAdmin.innerHTML = "";
+        const container = document.getElementById("listaProdutosAdmin");
+        if(!container) return;
+        container.innerHTML = "";
         produtos.forEach(prod => {
             const div = document.createElement("div");
             div.className = "produto-admin";
-            div.innerHTML = `
-                <span>${escapeHTML(prod.nome)} - R$ ${prod.preco.toFixed(2)}</span>
-                <button class="remover-produto-admin" data-id="${prod.id}" style="background:#e74c3c; border:none; color:white; border-radius:30px; padding:4px 12px;">X</button>
-            `;
-            containerAdmin.appendChild(div);
+            div.innerHTML = `<span>${escapeHTML(prod.nome)} - R$ ${prod.preco.toFixed(2)}</span><button class="remover-produto-admin" data-id="${prod.id}">X</button>`;
+            container.appendChild(div);
         });
         document.querySelectorAll(".remover-produto-admin").forEach(btn => {
             btn.addEventListener("click", (e) => {
@@ -512,53 +235,41 @@
 
     function adicionarProdutoAdmin(nome, preco) {
         if(!nome.trim() || isNaN(preco) || preco <= 0) return false;
-        const novoProd = {
-            id: Date.now(),
-            nome: nome.trim(),
-            preco: parseFloat(preco)
-        };
-        produtos.push(novoProd);
+        produtos.push({ id: Date.now(), nome: nome.trim(), preco: parseFloat(preco) });
         salvarProdutos();
         renderAdminProdutos();
         renderizarCardapio();
         return true;
     }
 
-    // ---------- GERENCIAMENTO DE COMANDAS (MESAS) ----------
+    // ---------- GERENCIAR COMANDAS ----------
     function renderizarSelecaoComandas() {
         const select = document.getElementById("selectMesa");
         const badgesDiv = document.getElementById("listaBadges");
         if(!select) return;
-        const comandasKeys = Object.keys(comandas);
+        const keys = Object.keys(comandas);
         select.innerHTML = "";
-        comandasKeys.forEach(key => {
-            const option = document.createElement("option");
-            option.value = key;
-            option.textContent = key;
-            if(key === comandaAtiva) option.selected = true;
-            select.appendChild(option);
+        keys.forEach(key => {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = key;
+            if(key === comandaAtiva) opt.selected = true;
+            select.appendChild(opt);
         });
-        // Badges rápidos
         badgesDiv.innerHTML = "";
-        comandasKeys.forEach(key => {
+        keys.forEach(key => {
             const badge = document.createElement("span");
-            badge.className = "badge-mesa";
-            if(key === comandaAtiva) badge.classList.add("ativa");
+            badge.className = "badge-mesa" + (key === comandaAtiva ? " ativa" : "");
             badge.innerHTML = `${key} <button class="remover-mesa" data-mesa="${key}">✖</button>`;
             badgesDiv.appendChild(badge);
         });
         document.querySelectorAll(".remover-mesa").forEach(btn => {
-            btn.addEventListener("click", (e) => {
+            btn.addEventListener("click", () => {
                 const mesa = btn.dataset.mesa;
-                if(comandasKeys.length === 1) {
-                    alert("Não é possível remover a única comanda.");
-                    return;
-                }
-                if(confirm(`Remover comanda ${mesa}? Todos os itens serão perdidos.`)) {
+                if(Object.keys(comandas).length === 1) { alert("Não pode remover a única comanda."); return; }
+                if(confirm(`Remover ${mesa}?`)) {
                     delete comandas[mesa];
-                    if(comandaAtiva === mesa) {
-                        comandaAtiva = Object.keys(comandas)[0];
-                    }
+                    if(comandaAtiva === mesa) comandaAtiva = Object.keys(comandas)[0];
                     salvarComandas();
                     renderizarSelecaoComandas();
                     renderizarCarrinho();
@@ -568,166 +279,178 @@
     }
 
     function novaComanda() {
-        let nomeBase = "Mesa ";
-        let numero = 1;
-        while(comandas[nomeBase + numero]) numero++;
-        const novaMesa = nomeBase + numero;
-        comandas[novaMesa] = [];
-        comandaAtiva = novaMesa;
+        let n = 1;
+        while(comandas[`Mesa ${n}`]) n++;
+        const nome = `Mesa ${n}`;
+        comandas[nome] = [];
+        comandaAtiva = nome;
         salvarComandas();
         renderizarSelecaoComandas();
         renderizarCarrinho();
     }
 
-    function mudarComanda(mesaId) {
-        if(comandas[mesaId]) {
-            comandaAtiva = mesaId;
+    function mudarComanda(mesa) {
+        if(comandas[mesa]) {
+            comandaAtiva = mesa;
             salvarComandas();
             renderizarSelecaoComandas();
             renderizarCarrinho();
         }
     }
 
-    // ---------- IMPRESSÃO ESC/POS (compartilhada) ----------
-    let device = null;
-
+    // ---------- IMPRESSÃO USB CORRIGIDA ----------
     async function conectarImpressora() {
         try {
+            // Tenta pegar dispositivo já autorizado
+            const devices = await navigator.usb.getDevices();
+            if (devices.length > 0) {
+                device = devices[0];
+                console.log("Usando dispositivo já autorizado:", device);
+                await prepararEndpoint();
+                return true;
+            }
+            // Solicita novo dispositivo
             const usbDevice = await navigator.usb.requestDevice({ filters: [] });
-            await usbDevice.open();
-            await usbDevice.selectConfiguration(1);
-            await usbDevice.claimInterface(0);
             device = usbDevice;
+            await prepararEndpoint();
             return true;
         } catch (error) {
-            console.error("Erro WebUSB:", error);
+            console.error("Erro na conexão USB:", error);
+            alert("Não foi possível conectar à impressora. Verifique o cabo USB-OTG e se a impressora está ligada.\n" + error.message);
             return false;
         }
     }
 
-    async function enviarEscapePOS(textoLinhasArray) {
-        if (!device) {
-            const conectou = await conectarImpressora();
-            if (!conectou) return false;
+    async function prepararEndpoint() {
+        if (!device) return false;
+        await device.open();
+        // Seleciona a primeira configuração (geralmente 1)
+        await device.selectConfiguration(1);
+        // Encontra a interface de saída (endpoint OUT)
+        let interfaceIndex = -1;
+        for (let i = 0; i < device.configuration.interfaces.length; i++) {
+            const iface = device.configuration.interfaces[i];
+            for (let alt of iface.alternates) {
+                const outEp = alt.endpoints.find(ep => ep.direction === "out");
+                if (outEp) {
+                    interfaceIndex = i;
+                    outEndpoint = outEp.endpointNumber;
+                    break;
+                }
+            }
+            if (interfaceIndex !== -1) break;
+        }
+        if (interfaceIndex === -1) throw new Error("Nenhum endpoint OUT encontrado na impressora.");
+        await device.claimInterface(interfaceIndex);
+        console.log(`Interface ${interfaceIndex} reivindicada, endpoint OUT = ${outEndpoint}`);
+        return true;
+    }
+
+    async function enviarComandoESC_POS(linhas) {
+        if (!device || !outEndpoint) {
+            const ok = await conectarImpressora();
+            if (!ok) return false;
         }
         try {
             const encoder = new TextEncoder();
-            const init = new Uint8Array([0x1B, 0x40]);
-            const center = new Uint8Array([0x1B, 0x61, 0x01]);
-            const alignLeft = new Uint8Array([0x1B, 0x61, 0x00]);
+            const init = new Uint8Array([0x1B, 0x40]);          // ESC @
+            const center = new Uint8Array([0x1B, 0x61, 0x01]);  // alinhar centro
+            const left = new Uint8Array([0x1B, 0x61, 0x00]);
             const boldOn = new Uint8Array([0x1B, 0x45, 0x01]);
             const boldOff = new Uint8Array([0x1B, 0x45, 0x00]);
-            const cut = new Uint8Array([0x1D, 0x56, 0x42, 0x00]);
+            const cut = new Uint8Array([0x1D, 0x56, 0x42, 0x00]); // corte parcial
 
-            let dados = [init, center, boldOn, encoder.encode("CARDÁPIO DIGITAL\n"), boldOff, encoder.encode("--------------------------------\n"), alignLeft];
-            for(let linha of textoLinhasArray) {
+            let dados = [init, center, boldOn, encoder.encode("CARDÁPIO\n"), boldOff, encoder.encode("-------------------\n"), left];
+            for (let linha of linhas) {
                 dados.push(encoder.encode(linha + "\n"));
             }
-            dados.push(encoder.encode("--------------------------------\n"));
-            dados.push(boldOn);
-            dados.push(encoder.encode(`\n`));
-            dados.push(boldOff);
-            dados.push(cut);
+            dados.push(encoder.encode("-------------------\n"), cut);
             for (const bloco of dados) {
-                await device.transferOut(1, bloco);
+                await device.transferOut(outEndpoint, bloco);
             }
             return true;
         } catch (err) {
-            console.error("Erro ESC/POS:", err);
+            console.error("Erro ao enviar dados USB:", err);
             return false;
         }
     }
 
-    // Gerar linhas para o pedido completo
-    function gerarLinhasPedidoCompleto() {
+    async function imprimirItens(itens) {
+        if (!itens.length) return;
+        const linhas = [];
+        linhas.push(`${comandaAtiva} - Item avulso`);
+        itens.forEach(item => {
+            const subtotal = item.preco * item.quantidade;
+            linhas.push(`${item.nome}  x${item.quantidade}  R$ ${subtotal.toFixed(2)}`);
+        });
+        linhas.push(`Data: ${new Date().toLocaleString()}`);
+        
+        if ("usb" in navigator) {
+            const ok = await enviarComandoESC_POS(linhas);
+            if (ok) {
+                alert("Item enviado para impressora!");
+                return;
+            } else {
+                alert("Falha na impressão USB. Usando fallback (impressão normal).");
+            }
+        } else {
+            alert("WebUSB não suportado. Usando fallback.");
+        }
+        // fallback
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><meta charset="UTF-8"><title>Item</title><style>body{font-family:monospace;width:80mm;margin:0 auto;padding:8px;}</style></head><body>${linhas.map(l=>`<div>${escapeHTML(l)}</div>`).join('')}<script>window.onload=function(){window.print();setTimeout(window.close,500)}<\/script></body></html>`);
+        win.document.close();
+    }
+
+    async function imprimirPedidoCompleto() {
         const carrinho = getCarrinhoAtual();
-        let linhas = [];
+        if (carrinho.length === 0) { alert("Carrinho vazio."); return; }
+        const linhas = [`${comandaAtiva}`, "--- Itens ---"];
         let total = 0;
-        linhas.push(`${comandaAtiva}`);
-        linhas.push("--- Itens ---");
         carrinho.forEach(item => {
             const subtotal = item.preco * item.quantidade;
             total += subtotal;
             linhas.push(`${item.nome} x${item.quantidade}  R$ ${subtotal.toFixed(2)}`);
         });
-        linhas.push(`TOTAL: R$ ${total.toFixed(2)}`);
-        linhas.push(`Data: ${new Date().toLocaleString()}`);
-        return linhas;
-    }
-
-    // Gerar linhas para um único item
-    function gerarLinhasItemUnico(item) {
-        let linhas = [];
-        linhas.push(`ITEM AVULSO`);
-        linhas.push(`${item.nome}  x${item.quantidade}  R$ ${(item.preco * item.quantidade).toFixed(2)}`);
-        linhas.push(`Data: ${new Date().toLocaleString()}`);
-        return linhas;
-    }
-
-    async function iniciarImpressaoCompleta() {
-        const carrinho = getCarrinhoAtual();
-        if(carrinho.length === 0) {
-            alert("Carrinho vazio. Adicione itens.");
-            return;
-        }
-        const linhas = gerarLinhasPedidoCompleto();
+        linhas.push(`TOTAL: R$ ${total.toFixed(2)}`, `Data: ${new Date().toLocaleString()}`);
         if ("usb" in navigator) {
-            const ok = await enviarEscapePOS(linhas);
-            if(ok) {
-                alert("Pedido enviado para impressora!");
-                if(confirm("Limpar pedido após impressão?")) {
+            const ok = await enviarComandoESC_POS(linhas);
+            if (ok) {
+                alert("Pedido completo enviado!");
+                if (confirm("Limpar carrinho após impressão?")) {
                     setCarrinhoAtual([]);
-                    renderizarCarrinho();
                 }
                 return;
             } else {
-                alert("Falha na impressão USB, usando fallback.");
-                imprimirFallback(linhas);
+                alert("Falha USB. Usando fallback.");
             }
         } else {
-            imprimirFallback(linhas);
+            alert("WebUSB não suportado. Usando fallback.");
         }
-    }
-
-    async function iniciarImpressaoItem(itemArray, nomeItem) {
-        if(itemArray.length === 0) return;
-        const linhas = gerarLinhasItemUnico(itemArray[0]);
-        if ("usb" in navigator) {
-            const ok = await enviarEscapePOS(linhas);
-            if(!ok) {
-                alert("Falha USB, usando fallback para este item.");
-                imprimirFallback(linhas);
-            }
-        } else {
-            imprimirFallback(linhas);
-        }
-    }
-
-    function imprimirFallback(linhas) {
-        let conteudo = `
-            <html><head><meta charset="UTF-8"><title>Impressão</title>
-            <style>body { font-family: monospace; width: 80mm; margin: 0 auto; padding: 8px; } .linha { margin:2px 0; }</style>
-            </head><body>
-        `;
-        linhas.forEach(lin => {
-            conteudo += `<div class="linha">${escapeHTML(lin)}</div>`;
-        });
-        conteudo += `<script>window.onload = function() { window.print(); setTimeout(()=>window.close(),500); }<\/script></body></html>`;
+        // fallback
         const win = window.open('', '_blank');
-        win.document.write(conteudo);
+        win.document.write(`<html><head><meta charset="UTF-8"><title>Pedido</title><style>body{font-family:monospace;width:80mm;margin:0 auto;padding:8px;}</style></head><body>${linhas.map(l=>`<div>${escapeHTML(l)}</div>`).join('')}<script>window.onload=function(){window.print();setTimeout(window.close,500)}<\/script></body></html>`);
         win.document.close();
     }
 
-    // ---------- EVENTOS E INIT ----------
-    function escapeHTML(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if(m === '&') return '&amp;';
-            if(m === '<') return '&lt;';
-            if(m === '>') return '&gt;';
-            return m;
-        });
+    async function testarImpressora() {
+        if (!("usb" in navigator)) {
+            alert("Seu navegador não suporta WebUSB. Use Chrome no Android.");
+            return;
+        }
+        const ok = await conectarImpressora();
+        if (ok) {
+            const teste = await enviarComandoESC_POS(["TESTE DE IMPRESSÃO", "Conexão USB funcionando!", new Date().toLocaleString()]);
+            if (teste) alert("✅ Impressora respondeu! Tente imprimir um item agora.");
+            else alert("❌ Falha ao enviar dados. Verifique se a impressora está pronta (papel, ligada).");
+        } else {
+            alert("Não foi possível conectar. Verifique cabo OTG e permissões.");
+        }
     }
 
+    function escapeHTML(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
+    // Eventos
     document.addEventListener("DOMContentLoaded", () => {
         carregarProdutos();
         carregarComandas();
@@ -736,21 +459,16 @@
         renderAdminProdutos();
         renderizarSelecaoComandas();
 
-        document.getElementById("selectMesa")?.addEventListener("change", (e) => {
-            mudarComanda(e.target.value);
-        });
+        document.getElementById("selectMesa")?.addEventListener("change", e => mudarComanda(e.target.value));
         document.getElementById("btnNovaMesa")?.addEventListener("click", novaComanda);
-        document.getElementById("limparComanda")?.addEventListener("click", limparComandaAtual);
-        document.getElementById("imprimirCompleto")?.addEventListener("click", iniciarImpressaoCompleta);
+        document.getElementById("limparComanda")?.addEventListener("click", () => { if(confirm("Limpar todos os itens?")) setCarrinhoAtual([]); });
+        document.getElementById("imprimirCompleto")?.addEventListener("click", imprimirPedidoCompleto);
+        document.getElementById("btnTestarImpressora")?.addEventListener("click", testarImpressora);
         document.getElementById("adicionarProdutoBtn")?.addEventListener("click", () => {
             const nome = document.getElementById("novoNome").value;
             const preco = parseFloat(document.getElementById("novoPreco").value);
-            if(adicionarProdutoAdmin(nome, preco)) {
-                document.getElementById("novoNome").value = "";
-                document.getElementById("novoPreco").value = "";
-            } else {
-                alert("Preencha nome e preço válido (>0)");
-            }
+            if(adicionarProdutoAdmin(nome, preco)) { document.getElementById("novoNome").value = ""; document.getElementById("novoPreco").value = ""; }
+            else alert("Preencha nome e preço válido.");
         });
     });
 </script>
