@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Cardápio + Comandas | Impressão ESC/POS (Corrigido)</title>
+    <title>Cardápio + Comandas | Impressão USB direta (sem fallback)</title>
     <style>
         * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
         body { background: #f5f5f5; margin: 0; padding: 12px; padding-bottom: 100px; }
@@ -33,6 +33,7 @@
         .lista-admin { max-height: 180px; overflow-y: auto; }
         .produto-admin { display: flex; justify-content: space-between; background: white; margin: 5px 0; padding: 8px 12px; border-radius: 40px; }
         @media (max-width: 500px) { .produtos-grid { grid-template-columns: 1fr 1fr; } }
+        .erro-msg { background: #e74c3c; color: white; border-radius: 30px; padding: 8px 12px; margin: 8px 0; text-align: center; }
     </style>
 </head>
 <body>
@@ -41,7 +42,7 @@
     <label>🍽️ Comanda atual:</label>
     <select id="selectMesa" class="mesa-select"></select>
     <button id="btnNovaMesa" class="btn-nova-mesa">➕ Nova Mesa</button>
-    <button id="btnTestarImpressora" class="btn-testar">🖨️ Testar Impressora</button>
+    <button id="btnTestarImpressora" class="btn-testar">🖨️ Testar Impressora (USB direto)</button>
 </div>
 <div id="listaBadges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;"></div>
 
@@ -53,7 +54,7 @@
     <div id="totalCarrinho" class="total">Total: R$ 0,00</div>
     <div class="acoes-carrinho">
         <button id="limparComanda" class="btn-limpar-comanda">🗑️ Limpar pedido</button>
-        <button id="imprimirCompleto" class="btn-imprimir-completo">🖨️ Imprimir pedido completo</button>
+        <button id="imprimirCompleto" class="btn-imprimir-completo">🖨️ Imprimir pedido completo (USB)</button>
     </div>
 </div>
 
@@ -74,7 +75,7 @@
     let comandas = {};
     let comandaAtiva = "Mesa 1";
     let device = null;
-    let outEndpoint = null;  // endpoint de saída dinâmico
+    let outEndpoint = null;
 
     const produtosIniciais = [
         { nome: "Virado à Mineira", preco: 35.00 },
@@ -185,7 +186,7 @@
                 <div class="item-carrinho">
                     <div><strong>${escapeHTML(item.nome)}</strong> x ${item.quantidade} - R$ ${subtotal.toFixed(2)}</div>
                     <div>
-                        <button class="btn-imprimir-item" data-idx="${idx}" data-nome="${item.nome}" data-preco="${item.preco}" data-qtd="${item.quantidade}">🖨️ Item</button>
+                        <button class="btn-imprimir-item" data-idx="${idx}" data-nome="${item.nome}" data-preco="${item.preco}" data-qtd="${item.quantidade}">🖨️ Item (USB)</button>
                         <button class="btn-remover-item" data-idx="${idx}">🗑️</button>
                     </div>
                 </div>
@@ -298,10 +299,9 @@
         }
     }
 
-    // ---------- IMPRESSÃO USB CORRIGIDA ----------
+    // ---------- IMPRESSÃO USB DIRETA (sem fallback) ----------
     async function conectarImpressora() {
         try {
-            // Tenta pegar dispositivo já autorizado
             const devices = await navigator.usb.getDevices();
             if (devices.length > 0) {
                 device = devices[0];
@@ -309,14 +309,13 @@
                 await prepararEndpoint();
                 return true;
             }
-            // Solicita novo dispositivo
             const usbDevice = await navigator.usb.requestDevice({ filters: [] });
             device = usbDevice;
             await prepararEndpoint();
             return true;
         } catch (error) {
             console.error("Erro na conexão USB:", error);
-            alert("Não foi possível conectar à impressora. Verifique o cabo USB-OTG e se a impressora está ligada.\n" + error.message);
+            mostrarErro("Não foi possível conectar à impressora: " + error.message);
             return false;
         }
     }
@@ -324,9 +323,7 @@
     async function prepararEndpoint() {
         if (!device) return false;
         await device.open();
-        // Seleciona a primeira configuração (geralmente 1)
         await device.selectConfiguration(1);
-        // Encontra a interface de saída (endpoint OUT)
         let interfaceIndex = -1;
         for (let i = 0; i < device.configuration.interfaces.length; i++) {
             const iface = device.configuration.interfaces[i];
@@ -340,72 +337,91 @@
             }
             if (interfaceIndex !== -1) break;
         }
-        if (interfaceIndex === -1) throw new Error("Nenhum endpoint OUT encontrado na impressora.");
+        if (interfaceIndex === -1) throw new Error("Nenhum endpoint OUT encontrado.");
         await device.claimInterface(interfaceIndex);
         console.log(`Interface ${interfaceIndex} reivindicada, endpoint OUT = ${outEndpoint}`);
         return true;
     }
 
-    async function enviarComandoESC_POS(linhas) {
+    async function enviarComandoESC_POS(linhasArray) {
         if (!device || !outEndpoint) {
             const ok = await conectarImpressora();
             if (!ok) return false;
         }
         try {
             const encoder = new TextEncoder();
-            const init = new Uint8Array([0x1B, 0x40]);          // ESC @
-            const center = new Uint8Array([0x1B, 0x61, 0x01]);  // alinhar centro
+            const init = new Uint8Array([0x1B, 0x40]);
+            const center = new Uint8Array([0x1B, 0x61, 0x01]);
             const left = new Uint8Array([0x1B, 0x61, 0x00]);
             const boldOn = new Uint8Array([0x1B, 0x45, 0x01]);
             const boldOff = new Uint8Array([0x1B, 0x45, 0x00]);
-            const cut = new Uint8Array([0x1D, 0x56, 0x42, 0x00]); // corte parcial
+            const normalWidth = new Uint8Array([0x1D, 0x21, 0x00]);
+            const cut = new Uint8Array([0x1D, 0x56, 0x42, 0x00]);
 
-            let dados = [init, center, boldOn, encoder.encode("CARDÁPIO\n"), boldOff, encoder.encode("-------------------\n"), left];
-            for (let linha of linhas) {
-                dados.push(encoder.encode(linha + "\n"));
+            let dados = [init, normalWidth, center, boldOn, encoder.encode("CARDÁPIO DIGITAL\n"), boldOff, encoder.encode("-------------------------------\n"), left];
+            for (let linha of linhasArray) {
+                let linhaLimitada = linha.length > 48 ? linha.substring(0,45)+"..." : linha;
+                dados.push(encoder.encode(linhaLimitada + "\n"));
             }
-            dados.push(encoder.encode("-------------------\n"), cut);
+            dados.push(encoder.encode("-------------------------------\n"), cut);
             for (const bloco of dados) {
                 await device.transferOut(outEndpoint, bloco);
             }
             return true;
         } catch (err) {
             console.error("Erro ao enviar dados USB:", err);
+            mostrarErro("Erro na transmissão USB: " + err.message);
             return false;
         }
     }
 
+    function mostrarErro(mensagem) {
+        // Exibe erro no próprio HTML (sem caixa de diálogo)
+        let errorDiv = document.getElementById("erroGlobal");
+        if (!errorDiv) {
+            errorDiv = document.createElement("div");
+            errorDiv.id = "erroGlobal";
+            errorDiv.className = "erro-msg";
+            document.body.prepend(errorDiv);
+        }
+        errorDiv.innerText = "⚠️ " + mensagem;
+        errorDiv.style.display = "block";
+        setTimeout(() => { errorDiv.style.display = "none"; }, 5000);
+    }
+
     async function imprimirItens(itens) {
         if (!itens.length) return;
+        if (!("usb" in navigator)) {
+            mostrarErro("WebUSB não é suportado neste navegador. Use Chrome no Android para impressão direta.");
+            return;
+        }
         const linhas = [];
-        linhas.push(`${comandaAtiva} - Item avulso`);
+        linhas.push(`${comandaAtiva} - Item individual`);
         itens.forEach(item => {
             const subtotal = item.preco * item.quantidade;
             linhas.push(`${item.nome}  x${item.quantidade}  R$ ${subtotal.toFixed(2)}`);
         });
         linhas.push(`Data: ${new Date().toLocaleString()}`);
         
-        if ("usb" in navigator) {
-            const ok = await enviarComandoESC_POS(linhas);
-            if (ok) {
-                alert("Item enviado para impressora!");
-                return;
-            } else {
-                alert("Falha na impressão USB. Usando fallback (impressão normal).");
-            }
+        const ok = await enviarComandoESC_POS(linhas);
+        if (ok) {
+            alert("✅ Item impresso diretamente via USB!");
         } else {
-            alert("WebUSB não suportado. Usando fallback.");
+            mostrarErro("Falha na impressão USB. Verifique a conexão e tente novamente.");
         }
-        // fallback
-        const win = window.open('', '_blank');
-        win.document.write(`<html><head><meta charset="UTF-8"><title>Item</title><style>body{font-family:monospace;width:80mm;margin:0 auto;padding:8px;}</style></head><body>${linhas.map(l=>`<div>${escapeHTML(l)}</div>`).join('')}<script>window.onload=function(){window.print();setTimeout(window.close,500)}<\/script></body></html>`);
-        win.document.close();
     }
 
     async function imprimirPedidoCompleto() {
         const carrinho = getCarrinhoAtual();
-        if (carrinho.length === 0) { alert("Carrinho vazio."); return; }
-        const linhas = [`${comandaAtiva}`, "--- Itens ---"];
+        if (carrinho.length === 0) {
+            mostrarErro("Carrinho vazio. Adicione itens antes de imprimir.");
+            return;
+        }
+        if (!("usb" in navigator)) {
+            mostrarErro("WebUSB não suportado. Use Chrome no Android.");
+            return;
+        }
+        const linhas = [`${comandaAtiva}`, "--- Itens do pedido ---"];
         let total = 0;
         carrinho.forEach(item => {
             const subtotal = item.preco * item.quantidade;
@@ -413,38 +429,40 @@
             linhas.push(`${item.nome} x${item.quantidade}  R$ ${subtotal.toFixed(2)}`);
         });
         linhas.push(`TOTAL: R$ ${total.toFixed(2)}`, `Data: ${new Date().toLocaleString()}`);
-        if ("usb" in navigator) {
-            const ok = await enviarComandoESC_POS(linhas);
-            if (ok) {
-                alert("Pedido completo enviado!");
-                if (confirm("Limpar carrinho após impressão?")) {
-                    setCarrinhoAtual([]);
-                }
-                return;
-            } else {
-                alert("Falha USB. Usando fallback.");
+        
+        const ok = await enviarComandoESC_POS(linhas);
+        if (ok) {
+            alert("✅ Pedido completo impresso diretamente via USB!");
+            if (confirm("Limpar carrinho após impressão?")) {
+                setCarrinhoAtual([]);
             }
         } else {
-            alert("WebUSB não suportado. Usando fallback.");
+            mostrarErro("Falha na impressão USB. Verifique a conexão.");
         }
-        // fallback
-        const win = window.open('', '_blank');
-        win.document.write(`<html><head><meta charset="UTF-8"><title>Pedido</title><style>body{font-family:monospace;width:80mm;margin:0 auto;padding:8px;}</style></head><body>${linhas.map(l=>`<div>${escapeHTML(l)}</div>`).join('')}<script>window.onload=function(){window.print();setTimeout(window.close,500)}<\/script></body></html>`);
-        win.document.close();
     }
 
     async function testarImpressora() {
         if (!("usb" in navigator)) {
-            alert("Seu navegador não suporta WebUSB. Use Chrome no Android.");
+            mostrarErro("WebUSB não suportado. Use Chrome no Android.");
             return;
         }
         const ok = await conectarImpressora();
         if (ok) {
-            const teste = await enviarComandoESC_POS(["TESTE DE IMPRESSÃO", "Conexão USB funcionando!", new Date().toLocaleString()]);
-            if (teste) alert("✅ Impressora respondeu! Tente imprimir um item agora.");
-            else alert("❌ Falha ao enviar dados. Verifique se a impressora está pronta (papel, ligada).");
+            const linhaTeste = "123456789012345678901234567890123456789012345678";
+            const teste = await enviarComandoESC_POS([
+                "=== TESTE 80mm (USB direto) ===",
+                "Esta impressão não abriu caixa de diálogo.",
+                "A comunicação é direta via ESC/POS.",
+                linhaTeste,
+                "Fim do teste - " + new Date().toLocaleString()
+            ]);
+            if (teste) {
+                alert("✅ Teste enviado com sucesso! Verifique a impressora.");
+            } else {
+                mostrarErro("Falha ao enviar teste. Verifique se a impressora está pronta.");
+            }
         } else {
-            alert("Não foi possível conectar. Verifique cabo OTG e permissões.");
+            mostrarErro("Não foi possível conectar à impressora.");
         }
     }
 
