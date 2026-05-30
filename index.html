@@ -896,39 +896,90 @@ function toLatin1(texto) {
   return bytes;
 }
 
+// Quebra texto em linhas respeitando largura máxima em caracteres
+// Não corta palavras ao meio — sempre quebra no espaço
+function quebrarLinhas(texto, maxChars) {
+  const palavras = texto.trim().split(" ");
+  const linhas = [];
+  let atual = "";
+  for (const palavra of palavras) {
+    // Palavra sozinha maior que o limite: corta forçado
+    if (palavra.length >= maxChars) {
+      if (atual) { linhas.push(atual.trim()); atual = ""; }
+      for (let i = 0; i < palavra.length; i += maxChars) {
+        linhas.push(palavra.substring(i, i + maxChars));
+      }
+      continue;
+    }
+    const tentativa = atual ? atual + " " + palavra : palavra;
+    if (tentativa.length > maxChars) {
+      linhas.push(atual.trim());
+      atual = palavra;
+    } else {
+      atual = tentativa;
+    }
+  }
+  if (atual.trim()) linhas.push(atual.trim());
+  return linhas;
+}
+
 async function enviarESCPOS(linhas, titulo = NOME_FESTIVAL) {
   const ok = await conectarUSB();
   if (!ok) return false;
   try {
-    const fontGrande = new Uint8Array([0x1D, 0x21, 0x11]);
-    const fontNormal = new Uint8Array([0x1D, 0x21, 0x00]);
-    const fontMedio  = new Uint8Array([0x1D, 0x21, 0x01]);
+    // Largura útil ~72mm
+    // Fonte normal  (0x00): ~12 pts → ~38 chars em 72mm
+    // Fonte média   (0x01): altura×2, largura normal → ~38 chars
+    // Fonte grande  (0x11): altura×2 + largura×2 → ~19 chars
+    const COLS_NORMAL = 38;  // chars por linha em fonte normal
+    const COLS_MEDIO  = 19;  // chars por linha em fonte média (largura×2)
+    const COLS_TITULO = 12;  // chars por linha no título (largura×2 + tamanho maior)
+
+    const fontGrande = new Uint8Array([0x1D, 0x21, 0x11]); // w×2 h×2
+    const fontMedio  = new Uint8Array([0x1D, 0x21, 0x11]); // w×2 h×2 (máximo legível p/ 79mm)
+    const fontNormal = new Uint8Array([0x1D, 0x21, 0x00]); // normal
+    const SEP_NORMAL = "-------------------------------\n";  // 31 chars = ok em 38 cols
+    const SEP_MEDIO  = "---------------\n";                  // 15 chars = ok em 19 cols
+
+    // Cabeçalho centralizado em fonte grande
+    const tituloLinhas = quebrarLinhas(removerAcentos(titulo), COLS_TITULO);
 
     const blocos = [
-      new Uint8Array([0x1B, 0x40]),
-      new Uint8Array([0x1B, 0x74, 0x00]),
-      new Uint8Array([0x1B, 0x61, 0x01]),
-      new Uint8Array([0x1B, 0x45, 0x01]),
+      new Uint8Array([0x1B, 0x40]),        // init
+      new Uint8Array([0x1B, 0x74, 0x00]),  // charset PC437
+      new Uint8Array([0x1B, 0x61, 0x01]),  // centralizar
+      new Uint8Array([0x1B, 0x45, 0x01]),  // bold on
       fontGrande,
-      toLatin1(titulo + "\n"),
-      fontNormal,
-      new Uint8Array([0x1B, 0x45, 0x00]),
-      toLatin1("--------------------------------\n"),
-      new Uint8Array([0x1B, 0x61, 0x00]),
     ];
+    for (const tl of tituloLinhas) blocos.push(toLatin1(tl + "\n"));
+    blocos.push(
+      fontNormal,
+      new Uint8Array([0x1B, 0x45, 0x00]),  // bold off
+      new Uint8Array([0x1B, 0x61, 0x00]),  // esquerda
+    );
 
     for (const linha of linhas) {
-      const ehDetalhe = linha.startsWith("  ") || linha.startsWith("---") || linha.startsWith("TOTAL") || linha.startsWith("Data");
-      blocos.push(ehDetalhe ? fontNormal : fontMedio);
-      const limitada = linha.length > 32 ? linha.substring(0, 29) + "..." : linha;
-      blocos.push(toLatin1(limitada + "\n"));
+      const ehDetalhe = linha.startsWith("  ") || linha.startsWith("---")
+                     || linha.startsWith("TOTAL") || linha.startsWith("Data");
+
+      if (ehDetalhe) {
+        // Detalhes em fonte normal, largura completa
+        blocos.push(fontNormal);
+        const sublins = quebrarLinhas(linha.trim(), COLS_NORMAL);
+        for (const sl of sublins) blocos.push(toLatin1(sl + "\n"));
+      } else {
+        // Nomes/títulos em fonte grande (w×2 h×2) — máximo impacto
+        blocos.push(fontMedio);
+        const sublins = quebrarLinhas(linha.trim(), COLS_MEDIO);
+        for (const sl of sublins) blocos.push(toLatin1(sl + "\n"));
+      }
     }
 
     blocos.push(
       fontNormal,
-      toLatin1("--------------------------------\n"),
+      toLatin1(SEP_NORMAL),
       new Uint8Array([0x0A, 0x0A]),
-      new Uint8Array([0x1D, 0x56, 0x42, 0x00])
+      new Uint8Array([0x1D, 0x56, 0x42, 0x00])  // cortar
     );
 
     for (const bloco of blocos) await usbDevice.transferOut(usbEndpoint, bloco);
