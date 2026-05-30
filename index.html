@@ -211,6 +211,25 @@
     min-width: 24px;
     text-align: center;
   }
+  .card-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .ficha-btn {
+    padding: 9px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .ficha-btn:hover { border-color: var(--accent2); color: var(--accent2); }
   .add-prod-btn {
     width: 100%;
     padding: 9px;
@@ -531,7 +550,10 @@ function renderCardapio() {
         <span class="qtd-val" id="qtd-${p.id}">1</span>
         <button class="qtd-btn" data-id="${p.id}" data-op="mais">+</button>
       </div>
-      <button class="add-prod-btn" data-id="${p.id}">Adicionar ao pedido</button>
+      <div class="card-btns">
+        <button class="ficha-btn" data-id="${p.id}">&#128424; Ficha</button>
+        <button class="add-prod-btn" data-id="${p.id}">+ Pedido</button>
+      </div>
     `;
     grid.appendChild(card);
   });
@@ -554,6 +576,15 @@ function renderCardapio() {
       adicionarItem(p, qtd);
       document.getElementById(`qtd-${p.id}`).textContent = "1";
       toast(`${p.nome} adicionado`, "sucesso");
+    });
+  });
+
+  grid.querySelectorAll(".ficha-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const p = produtos.find(x => x.id === parseInt(btn.dataset.id));
+      if (!p) return;
+      const qtd = parseInt(document.getElementById(`qtd-${p.id}`).textContent) || 1;
+      imprimirFicha(p, qtd);
     });
   });
 }
@@ -767,12 +798,20 @@ async function conectarUSB() {
   }
 }
 
-// Converte texto para bytes Latin-1 (compatível com ESC/POS)
+// Remove acentos e caracteres fora do ASCII
+function removerAcentos(texto) {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // remove diacríticos (á→a, ç→c, etc)
+    .replace(/[^\x00-\x7F]/g, "");    // remove qualquer coisa fora do ASCII
+}
+
+// Converte texto para bytes Latin-1 sem acentos (compatível com ESC/POS)
 function toLatin1(texto) {
-  const bytes = new Uint8Array(texto.length);
-  for (let i = 0; i < texto.length; i++) {
-    const c = texto.charCodeAt(i);
-    bytes[i] = c <= 0xFF ? c : 0x3F; // '?' para caracteres fora de range
+  const limpo = removerAcentos(texto);
+  const bytes = new Uint8Array(limpo.length);
+  for (let i = 0; i < limpo.length; i++) {
+    bytes[i] = limpo.charCodeAt(i) & 0xFF;
   }
   return bytes;
 }
@@ -782,27 +821,45 @@ async function enviarESCPOS(linhas) {
   if (!ok) return false;
 
   try {
+    // 0x1D 0x21 0x11 = altura x2 + largura x2 (fonte grande)
+    // 0x1D 0x21 0x10 = só largura x2
+    // 0x1D 0x21 0x01 = só altura x2
+    // 0x1D 0x21 0x00 = tamanho normal
+    const fontGrande    = new Uint8Array([0x1D, 0x21, 0x11]); // dobra largura e altura
+    const fontNormal    = new Uint8Array([0x1D, 0x21, 0x00]);
+    const fontMedio     = new Uint8Array([0x1D, 0x21, 0x01]); // só altura x2
+
     const blocos = [
       new Uint8Array([0x1B, 0x40]),       // inicializar
-      new Uint8Array([0x1B, 0x74, 0x02]), // charset CP850
-      new Uint8Array([0x1D, 0x21, 0x00]), // tamanho normal
+      new Uint8Array([0x1B, 0x74, 0x00]), // charset PC437 (ASCII puro, mais compatível)
       new Uint8Array([0x1B, 0x61, 0x01]), // centralizar
       new Uint8Array([0x1B, 0x45, 0x01]), // bold on
-      toLatin1("CARDAPIO DIGITAL\n"),
+      fontGrande,
+      toLatin1("CARDAPIO\n"),
+      fontNormal,
       new Uint8Array([0x1B, 0x45, 0x00]), // bold off
       toLatin1("--------------------------------\n"),
       new Uint8Array([0x1B, 0x61, 0x00]), // alinhar esquerda
     ];
 
     for (const linha of linhas) {
-      const limitada = linha.length > 48 ? linha.substring(0, 45) + "..." : linha;
+      // Linhas que começam com espaço são detalhes (preço/qtd) — fonte normal
+      // Demais são nomes de produtos — fonte média (altura dupla)
+      const ehDetalhe = linha.startsWith("  ") || linha.startsWith("---") || linha.startsWith("TOTAL") || linha.startsWith("Data");
+      if (ehDetalhe) {
+        blocos.push(fontNormal);
+      } else {
+        blocos.push(fontMedio); // altura x2 para nomes e títulos
+      }
+      const limitada = linha.length > 32 ? linha.substring(0, 29) + "..." : linha;
       blocos.push(toLatin1(limitada + "\n"));
     }
 
     blocos.push(
+      fontNormal,
       toLatin1("--------------------------------\n"),
-      new Uint8Array([0x0A, 0x0A]),        // 2 linhas em branco
-      new Uint8Array([0x1D, 0x56, 0x42, 0x00]) // cortar papel
+      new Uint8Array([0x0A, 0x0A]),             // 2 linhas em branco
+      new Uint8Array([0x1D, 0x56, 0x42, 0x00])  // cortar papel
     );
 
     for (const bloco of blocos) {
@@ -813,11 +870,23 @@ async function enviarESCPOS(linhas) {
   } catch (err) {
     console.error("Erro transmissão USB:", err);
     toast("Erro na transmissão: " + err.message, "erro");
-    // Reseta para forçar reconexão
     await desconectarUSB();
     setStatus("Desconectado após erro", "erro");
     return false;
   }
+}
+
+async function imprimirFicha(prod, qtd) {
+  const sub = prod.preco * qtd;
+  const linhas = [
+    `${comandaAtiva}`,
+    "--- FICHA ---",
+    `${prod.nome}`,
+    `  x${qtd}  R$ ${sub.toFixed(2)}`,
+    `Data: ${new Date().toLocaleString("pt-BR")}`
+  ];
+  const ok = await enviarESCPOS(linhas);
+  if (ok) toast("Ficha impressa!", "sucesso");
 }
 
 async function imprimirItens(itens) {
