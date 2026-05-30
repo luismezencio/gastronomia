@@ -932,11 +932,11 @@ async function enviarESCPOS(linhas, titulo = NOME_FESTIVAL) {
     // Fonte média   (0x01): altura×2, largura normal → ~38 chars
     // Fonte grande  (0x11): altura×2 + largura×2 → ~19 chars
     const COLS_NORMAL = 38;  // chars por linha em fonte normal
-    const COLS_MEDIO  = 19;  // chars por linha em fonte média (largura×2)
-    const COLS_TITULO = 12;  // chars por linha no título (largura×2 + tamanho maior)
+    const COLS_MEDIO  = 25;  // chars por linha em fonte média (largura×2)
+    const COLS_TITULO = 20;  // chars por linha no título (largura×2 + tamanho maior)
 
-    const fontGrande = new Uint8Array([0x1D, 0x21, 0x11]); // w×2 h×2
-    const fontMedio  = new Uint8Array([0x1D, 0x21, 0x11]); // w×2 h×2 (máximo legível p/ 79mm)
+    const fontGrande = new Uint8Array([0x1D, 0x15, 0x08]); // w×2 h×2
+    const fontMedio  = new Uint8Array([0x1D, 0x15, 0x08]); // w×2 h×2 (máximo legível p/ 79mm)
     const fontNormal = new Uint8Array([0x1D, 0x21, 0x00]); // normal
     const SEP_NORMAL = "-------------------------------\n";  // 31 chars = ok em 38 cols
     const SEP_MEDIO  = "---------------\n";                  // 15 chars = ok em 19 cols
