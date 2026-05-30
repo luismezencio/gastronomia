@@ -877,6 +877,8 @@ async function enviarESCPOS(linhas) {
 }
 
 async function imprimirFicha(prod, qtd) {
+  adicionarItem(prod, qtd);
+  document.getElementById(`qtd-${prod.id}`).textContent = "1";
   const sub = prod.preco * qtd;
   const linhas = [
     `${comandaAtiva}`,
